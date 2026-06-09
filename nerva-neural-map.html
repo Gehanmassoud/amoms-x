@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NERVA — Enterprise Neural Map</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg: #04040e;
+  --surface: #08081a;
+  --border: rgba(80,80,200,0.15);
+  --purple: #8b83f0;
+  --green: #22c98a;
+  --amber: #f5a623;
+  --red: #f04747;
+  --blue: #4a9eff;
+  --text: #d0d0f0;
+  --muted: #5a5a80;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+/* TOP BAR */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(8,8,26,0.98);
+  flex-shrink: 0;
+}
+
+.brand { display: flex; align-items: center; gap: 12px; }
+
+.brand-pulse {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--purple);
+  box-shadow: 0 0 8px var(--purple);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+
+.brand-text { font-family: var(--mono); font-size: 14px; font-weight: 600; letter-spacing: 0.12em; color: var(--purple); }
+.brand-sub { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 1px; }
+
+.metrics { display: flex; gap: 24px; }
+.metric { text-align: center; }
+.metric-n { font-family: var(--mono); font-size: 18px; font-weight: 600; color: var(--text); line-height: 1; }
+.metric-n.red { color: var(--red); animation: blink 1s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.metric-l { font-size: 9px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 3px; }
+
+/* CANVAS */
+#c { flex: 1; display: block; width: 100%; cursor: crosshair; }
+
+/* BOTTOM BAR */
+.bottombar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  border-top: 1px solid var(--border);
+  background: rgba(8,8,26,0.98);
+  flex-shrink: 0;
+  gap: 16px;
+}
+
+.btns { display: flex; gap: 6px; }
+
+.btn {
+  padding: 7px 16px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid rgba(100,100,200,0.3);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.btn:hover { border-color: var(--purple); color: var(--purple); background: rgba(139,131,240,0.08); }
+.btn.on { border-color: var(--purple); color: var(--purple); background: rgba(139,131,240,0.12); }
+.btn.scan { border-color: rgba(240,71,71,0.5); color: var(--red); }
+.btn.scan:hover { background: rgba(240,71,71,0.1); border-color: var(--red); }
+.btn.scan.active { background: rgba(240,71,71,0.15); border-color: var(--red); animation: blink 0.7s infinite; }
+
+.legend { display: flex; gap: 16px; align-items: center; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+.ld { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.status {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  min-width: 340px;
+  text-align: right;
+  transition: color 0.3s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.status.alert { color: var(--red); }
+.status.warn { color: var(--amber); }
+
+/* ALERT PANEL */
+.ap {
+  position: fixed;
+  top: 64px;
+  right: 20px;
+  width: 290px;
+  background: rgba(6,4,14,0.97);
+  border: 1px solid var(--red);
+  border-radius: 8px;
+  padding: 16px;
+  opacity: 0;
+  transform: translateX(16px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
+  z-index: 100;
+  box-shadow: 0 0 30px rgba(240,71,71,0.15);
+}
+.ap.show { opacity: 1; transform: translateX(0); }
+
+.ap-head {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px; padding-bottom: 10px;
+  border-bottom: 1px solid rgba(240,71,71,0.2);
+}
+.ap-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); animation: blink 0.8s infinite; }
+.ap-title { font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: var(--red); text-transform: uppercase; }
+
+.ap-row {
+  display: flex; justify-content: space-between; gap: 8px;
+  padding: 4px 0; font-size: 12px; line-height: 1.5;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.ap-row:last-of-type { border-bottom: none; }
+.ap-k { color: var(--muted); font-size: 11px; flex-shrink: 0; }
+.ap-v { color: var(--text); font-weight: 500; text-align: right; }
+.ap-v.red { color: var(--red); font-family: var(--mono); }
+
+.ap-noticed {
+  margin-top: 12px; padding-top: 10px;
+  border-top: 1px solid rgba(240,71,71,0.2);
+  font-family: var(--mono); font-size: 11px;
+  color: rgba(139,131,240,0.75);
+  font-style: italic; line-height: 1.7;
+}
+
+/* TOOLTIP */
+.tooltip {
+  position: fixed;
+  background: rgba(8,8,26,0.97);
+  border: 1px solid rgba(139,131,240,0.4);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 200;
+  max-width: 200px;
+}
+.tooltip.show { opacity: 1; }
+.tt-name { font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.tt-type { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.tt-deps { font-size: 11px; color: var(--purple); margin-top: 4px; }
+
+/* INSTRUCTIONS */
+.hint {
+  position: fixed;
+  bottom: 58px;
+  left: 20px;
+  font-size: 11px;
+  color: rgba(90,90,128,0.6);
+  font-family: var(--mono);
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-pulse"></div>
+    <div>
+      <div class="brand-text">NERVA</div>
+      <div class="brand-sub">Enterprise Neural Map · Digital Twin Active</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="metric-n" id="m-e">28</div><div class="metric-l">Entities</div></div>
+    <div class="metric"><div class="metric-n" id="m-d">41</div><div class="metric-l">Dependencies</div></div>
+    <div class="metric"><div class="metric-n red" id="m-t" style="color:var(--text)">0</div><div class="metric-l">Threats</div></div>
+    <div class="metric"><div class="metric-n" id="m-r" style="color:var(--muted)">—</div><div class="metric-l">At Risk</div></div>
+  </div>
+</div>
+
+<canvas id="c"></canvas>
+
+<div class="alert-panel ap" id="ap">
+  <div class="ap-head"><div class="ap-dot"></div><div class="ap-title">NERVA · Immune Alert</div></div>
+  <div class="ap-row"><span class="ap-k">Threat type</span><span class="ap-v">OrganizationalRisk</span></div>
+  <div class="ap-row"><span class="ap-k">Trigger</span><span class="ap-v">Lead architect resigned</span></div>
+  <div class="ap-row"><span class="ap-k">Affected</span><span class="ap-v">3 critical projects</span></div>
+  <div class="ap-row"><span class="ap-k">Transfer</span><span class="ap-v red">Not scheduled</span></div>
+  <div class="ap-row"><span class="ap-k">Impact window</span><span class="ap-v">17 days</span></div>
+  <div class="ap-row"><span class="ap-k">Confidence</span><span class="ap-v red">94%</span></div>
+  <div class="ap-row"><span class="ap-k">Revenue at risk</span><span class="ap-v red">$1,400,000</span></div>
+  <div class="ap-noticed">"No one asked me to do this.<br>I noticed."</div>
+</div>
+
+<div class="tooltip" id="tt">
+  <div class="tt-name" id="tt-name"></div>
+  <div class="tt-type" id="tt-type"></div>
+  <div class="tt-deps" id="tt-deps"></div>
+</div>
+
+<div class="hint" id="hint">hover over nodes · click IMMUNE SCAN to detect threats</div>
+
+<div class="bottombar">
+  <div class="btns">
+    <button class="btn on" id="b-all" onclick="setFilter('all',this)">All</button>
+    <button class="btn" id="b-ppl" onclick="setFilter('people',this)">People</button>
+    <button class="btn" id="b-proj" onclick="setFilter('projects',this)">Projects</button>
+    <button class="btn" id="b-risk" onclick="setFilter('risks',this)">Risks</button>
+    <button class="btn scan" id="b-scan" onclick="triggerScan()">▶ Immune Scan</button>
+  </div>
+  <div class="legend">
+    <div class="leg"><div class="ld" style="background:#8b83f0"></div>People</div>
+    <div class="leg"><div class="ld" style="background:#22c98a"></div>Projects</div>
+    <div class="leg"><div class="ld" style="background:#f5a623"></div>Vendors</div>
+    <div class="leg"><div class="ld" style="background:#f04747"></div>Risks</div>
+    <div class="leg"><div class="ld" style="background:#4a9eff"></div>Customers</div>
+  </div>
+  <div class="status" id="status">Digital twin active · monitoring 28 entities across 41 dependencies</div>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H, nodes, tick = 0, animId, filter = 'all', immune = false, ripples = [], hovered = null;
+
+const COL = {
+  people:   {fill:'#1a1640', stroke:'#8b83f0', glow:'rgba(139,131,240,0.2)'},
+  project:  {fill:'#0c3020', stroke:'#22c98a', glow:'rgba(34,201,138,0.2)'},
+  vendor:   {fill:'#2e1e00', stroke:'#f5a623', glow:'rgba(245,166,35,0.2)'},
+  risk:     {fill:'#2e0808', stroke:'#f04747', glow:'rgba(240,71,71,0.25)'},
+  customer: {fill:'#0a1e38', stroke:'#4a9eff', glow:'rgba(74,158,255,0.2)'},
+};
+
+const NODES = [
+  {id:0,  label:'Lead\nArchitect',  short:'Architect',  type:'people',   r:17, key:true,  deps:['Alpha','Beta','Gamma','VP Eng']},
+  {id:1,  label:'VP\nEng',          short:'VP Eng',      type:'people',   r:14, deps:['CTO','Alpha','Product X']},
+  {id:2,  label:'CTO',              short:'CTO',         type:'people',   r:14, deps:['Platform']},
+  {id:3,  label:'Dev\nLead',        short:'Dev Lead',    type:'people',   r:12, deps:['Alpha','Beta']},
+  {id:4,  label:'PM',               short:'PM',          type:'people',   r:11, deps:['Gamma','Product X']},
+  {id:5,  label:'QA\nLead',         short:'QA Lead',     type:'people',   r:11, deps:['Alpha','Beta','Gamma']},
+  {id:6,  label:'Project\nAlpha',   short:'Alpha',       type:'project',  r:17, key:true,  deps:['Enterprise Co']},
+  {id:7,  label:'Project\nBeta',    short:'Beta',        type:'project',  r:15, key:true,  deps:['Enterprise Co','Premium Co']},
+  {id:8,  label:'Project\nGamma',   short:'Gamma',       type:'project',  r:14, key:true,  deps:['Std Client']},
+  {id:9,  label:'Product\nX',       short:'Product X',   type:'project',  r:13, deps:['Enterprise Co']},
+  {id:10, label:'Platform',         short:'Platform',    type:'project',  r:12},
+  {id:11, label:'FedEx\nNE',        short:'FedEx NE',    type:'vendor',   r:14, key:true,  deps:['Carrier Risk','SLA Breach']},
+  {id:12, label:'AWS',              short:'AWS',         type:'vendor',   r:11, deps:['Platform']},
+  {id:13, label:'Vendor C',         short:'Vendor C',    type:'vendor',   r:10, deps:['Product X']},
+  {id:14, label:'Carrier\nRisk',    short:'Carrier Risk',type:'risk',     r:13, key:true},
+  {id:15, label:'SLA\nBreach',      short:'SLA Breach',  type:'risk',     r:12, key:true},
+  {id:16, label:'Org\nRisk',        short:'Org Risk',    type:'risk',     r:16, key:true,  deps:['Architect']},
+  {id:17, label:'Enterprise\nCo',   short:'Enterprise',  type:'customer', r:14},
+  {id:18, label:'Premium\nCo',      short:'Premium Co',  type:'customer', r:12},
+  {id:19, label:'Std\nClient',      short:'Std Client',  type:'customer', r:10},
+  {id:20, label:'Sr\nEngineer',     short:'Sr Eng',      type:'people',   r:11},
+  {id:21, label:'Release\nMgr',     short:'Release Mgr', type:'people',   r:11},
+  {id:22, label:'Data\nEng',        short:'Data Eng',    type:'people',   r:9},
+  {id:23, label:'Designer',         short:'Designer',    type:'people',   r:9},
+  {id:24, label:'Sprint\nA',        short:'Sprint A',    type:'project',  r:9},
+  {id:25, label:'Sprint\nB',        short:'Sprint B',    type:'project',  r:9},
+  {id:26, label:'Infra',            short:'Infra',       type:'vendor',   r:9},
+  {id:27, label:'Compliance',       short:'Compliance',  type:'risk',     r:10},
+];
+
+const EDGES = [
+  [0,6],[0,7],[0,8],[0,1],[0,20],
+  [1,2],[1,6],[1,9],
+  [2,10],[3,6],[3,7],[4,8],[4,9],
+  [5,6],[5,7],[5,8],
+  [6,17],[7,17],[7,18],[8,19],
+  [11,14],[11,15],[11,6],[11,7],
+  [14,15],[15,16],[16,0],
+  [12,10],[13,9],[17,9],
+  [20,24],[21,8],[22,10],[23,25],
+  [24,6],[25,7],[26,12],[27,8],
+  [3,4],[4,5],[20,21],[22,23],
+];
+
+function vis(n){
+  if(filter==='all') return true;
+  if(filter==='people') return n.type==='people';
+  if(filter==='projects') return n.type==='project'||n.type==='people';
+  if(filter==='risks') return n.type==='risk'||n.type==='vendor'||n.key;
+  return true;
+}
+
+function resize(){
+  W = canvas.offsetWidth; H = canvas.offsetHeight;
+  canvas.width = W * devicePixelRatio; canvas.height = H * devicePixelRatio;
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+}
+
+function init(){
+  resize();
+  nodes = NODES.map((n,i)=>{
+    const a = (i/NODES.length)*Math.PI*2;
+    const d = 70 + Math.random()*Math.min(W,H)*0.26;
+    return {...n, x:W/2+Math.cos(a)*d, y:H/2+Math.sin(a)*d, vx:(Math.random()-0.5)*0.4, vy:(Math.random()-0.5)*0.4, heat:0};
+  });
+}
+
+function physics(){
+  const cx=W/2, cy=H/2;
+  nodes.forEach(n=>{
+    if(!vis(n)){n.heat=Math.max(0,n.heat-0.02); return;}
+    let fx=(cx-n.x)*0.0007, fy=(cy-n.y)*0.0007;
+    nodes.forEach(m=>{
+      if(m===n||!vis(m)) return;
+      const dx=n.x-m.x, dy=n.y-m.y, d=Math.sqrt(dx*dx+dy*dy)||1;
+      const f=Math.min(2000,1200)/(d*d); fx+=dx/d*f; fy+=dy/d*f;
+    });
+    EDGES.forEach(([a,b])=>{
+      const m=a===n.id?nodes[b]:b===n.id?nodes[a]:null;
+      if(!m||!vis(m)) return;
+      const dx=m.x-n.x, dy=m.y-n.y, d=Math.sqrt(dx*dx+dy*dy)||1;
+      const f=(d-100)*0.0035; fx+=dx/d*f; fy+=dy/d*f;
+    });
+    n.vx=(n.vx+fx)*0.85; n.vy=(n.vy+fy)*0.85;
+    n.x=Math.max(n.r+14,Math.min(W-n.r-14,n.x+n.vx));
+    n.y=Math.max(n.r+14,Math.min(H-n.r-14,n.y+n.vy));
+  });
+}
+
+function heatSpread(){
+  if(!immune) return;
+  const seeds=[0,6,7,8,11,14,15,16];
+  seeds.forEach(id=>{nodes[id].heat=Math.min(1,nodes[id].heat+0.02);});
+  EDGES.forEach(([a,b])=>{
+    const na=nodes[a], nb=nodes[b];
+    if(na.heat>0.2&&nb.heat<na.heat-0.15) nb.heat=Math.min(1,nb.heat+0.007);
+    if(nb.heat>0.2&&na.heat<nb.heat-0.15) na.heat=Math.min(1,na.heat+0.007);
+  });
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  tick++;
+
+  // background
+  ctx.fillStyle='#04040e'; ctx.fillRect(0,0,W,H);
+  const bg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.min(W,H)*0.6);
+  bg.addColorStop(0,'rgba(20,12,50,0.45)'); bg.addColorStop(1,'rgba(4,4,14,0)');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  // edges
+  EDGES.forEach(([a,b])=>{
+    const na=nodes[a], nb=nodes[b];
+    if(!vis(na)||!vis(nb)) return;
+    const h=Math.max(na.heat,nb.heat);
+    const isHover = hovered && (na.id===hovered.id||nb.id===hovered.id);
+    ctx.beginPath(); ctx.moveTo(na.x,na.y); ctx.lineTo(nb.x,nb.y);
+    if(immune&&h>0.08){
+      ctx.strokeStyle=`rgba(240,71,71,${0.1+h*0.6})`;
+      ctx.lineWidth=0.5+h*2;
+    } else if(isHover){
+      ctx.strokeStyle='rgba(139,131,240,0.5)';
+      ctx.lineWidth=1.2;
+    } else {
+      ctx.strokeStyle='rgba(60,60,120,0.14)';
+      ctx.lineWidth=0.6;
+    }
+    ctx.stroke();
+  });
+
+  // ripples
+  ripples=ripples.filter(r=>r.a>0.01);
+  ripples.forEach(r=>{
+    r.rad+=2.8; r.a*=0.92;
+    ctx.beginPath(); ctx.arc(r.x,r.y,r.rad,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(240,71,71,${r.a})`;
+    ctx.lineWidth=1.5; ctx.stroke();
+  });
+
+  // nodes
+  nodes.forEach(n=>{
+    if(!vis(n)) return;
+    const c=COL[n.type];
+    const isHot=immune&&n.heat>0.05;
+    const isHov=hovered&&hovered.id===n.id;
+    const wave=isHot?1+0.09*Math.sin(tick*0.13+n.id):isHov?1.1:1+0.02*Math.sin(tick*0.022+n.id*0.9);
+    const r=n.r*wave;
+
+    // glow
+    if(isHot){
+      const g=ctx.createRadialGradient(n.x,n.y,r*0.2,n.x,n.y,r*3.2);
+      g.addColorStop(0,`rgba(240,71,71,${n.heat*0.4})`);
+      g.addColorStop(1,'rgba(240,71,71,0)');
+      ctx.beginPath(); ctx.arc(n.x,n.y,r*3.2,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+    } else if(n.key||isHov){
+      ctx.beginPath(); ctx.arc(n.x,n.y,r*2.2,0,Math.PI*2);
+      ctx.fillStyle=isHov?'rgba(139,131,240,0.15)':c.glow; ctx.fill();
+    }
+
+    // body
+    ctx.beginPath(); ctx.arc(n.x,n.y,r,0,Math.PI*2);
+    if(isHot){
+      const g=ctx.createRadialGradient(n.x-r*0.25,n.y-r*0.25,0,n.x,n.y,r);
+      g.addColorStop(0,`rgba(${180+n.heat*75},${30},${30},0.95)`);
+      g.addColorStop(1,`rgba(${80+n.heat*60},10,10,0.9)`);
+      ctx.fillStyle=g;
+    } else {
+      ctx.fillStyle=c.fill;
+    }
+    ctx.fill();
+    ctx.strokeStyle=isHot?`rgba(240,${71-n.heat*40},${71-n.heat*40},${0.6+n.heat*0.4})`:isHov?'rgba(139,131,240,0.9)':c.stroke;
+    ctx.lineWidth=isHot?1+n.heat*0.5:isHov?1.5:0.8;
+    ctx.stroke();
+
+    // label — clean split on \n
+    if(r>=8){
+      const fs=Math.max(8,Math.min(11,r*0.58));
+      ctx.font=`500 ${fs}px 'Inter',sans-serif`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillStyle=isHot?`rgba(255,${180-n.heat*120},${180-n.heat*120},0.95)`:'rgba(210,210,245,0.92)';
+      const lines=n.label.split('\n');
+      const lh=fs*1.25;
+      const startY=n.y-(lines.length-1)*lh/2;
+      lines.forEach((line,i)=>ctx.fillText(line,n.x,startY+i*lh));
+    }
+
+    // ripple spawner
+    if(isHot&&n.heat>0.55&&Math.random()<0.03){
+      ripples.push({x:n.x,y:n.y,rad:r,a:0.5});
+    }
+  });
+}
+
+function loop(){ physics(); heatSpread(); draw(); animId=requestAnimationFrame(loop); }
+
+// mouse
+canvas.addEventListener('mousemove',e=>{
+  const rect=canvas.getBoundingClientRect();
+  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  let found=null;
+  nodes.forEach(n=>{
+    if(!vis(n)) return;
+    const dx=n.x-mx, dy=n.y-my;
+    if(Math.sqrt(dx*dx+dy*dy)<n.r*1.3) found=n;
+  });
+  hovered=found;
+  const tt=document.getElementById('tt');
+  if(found){
+    document.getElementById('tt-name').textContent=found.short;
+    document.getElementById('tt-type').textContent=found.type.toUpperCase();
+    const depCount=EDGES.filter(([a,b])=>a===found.id||b===found.id).length;
+    document.getElementById('tt-deps').textContent=depCount+' direct dependencies';
+    tt.style.left=(e.clientX+14)+'px';
+    tt.style.top=(e.clientY-10)+'px';
+    tt.classList.add('show');
+    canvas.style.cursor='pointer';
+  } else {
+    tt.classList.remove('show');
+    canvas.style.cursor='crosshair';
+  }
+});
+
+canvas.addEventListener('mouseleave',()=>{ hovered=null; document.getElementById('tt').classList.remove('show'); });
+
+function setFilter(f,btn){
+  filter=f;
+  document.querySelectorAll('.btn:not(.scan)').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const msgs={
+    all:'Digital twin active · monitoring 28 entities across 41 dependencies',
+    people:'People layer · 8 employees · 12 relationships',
+    projects:'Project layer · 5 active projects · 18 dependencies',
+    risks:'Risk layer · immune threats highlighted'
+  };
+  const s=document.getElementById('status');
+  s.textContent=msgs[f]||'';
+  s.className='status';
+}
+
+function triggerScan(){
+  if(immune) return;
+  immune=true;
+  filter='all';
+  document.querySelectorAll('.btn:not(.scan)').forEach(b=>b.classList.remove('on'));
+  document.getElementById('b-all').classList.add('on');
+  document.getElementById('b-scan').classList.add('active');
+  nodes.forEach(n=>n.heat=0); ripples=[];
+
+  const s=document.getElementById('status');
+  const steps=[
+    [0,   'warn',  'Immune scan initiated · traversing Fabric IQ entity graph...'],
+    [900, 'warn',  'Lead architect node flagged · tracing dependency chain...'],
+    [1700,'warn',  'Propagating risk through 3 project nodes · calculating exposure...'],
+    [2600,'alert', 'IMMUNE ALERT · Predicted organizational failure · $1.4M at risk · 17 days'],
+  ];
+  steps.forEach(([t,cls,msg])=>{
+    setTimeout(()=>{ s.textContent=msg; s.className='status '+cls; },t);
+  });
+
+  setTimeout(()=>{
+    document.getElementById('ap').classList.add('show');
+    document.getElementById('m-t').textContent='1';
+    document.getElementById('m-t').classList.add('red');
+    document.getElementById('m-r').textContent='$1.4M';
+    document.getElementById('m-r').style.color='var(--red)';
+    document.getElementById('b-scan').classList.remove('active');
+    document.getElementById('hint').style.opacity='0';
+  },2700);
+}
+
+window.addEventListener('resize',()=>{ cancelAnimationFrame(animId); init(); loop(); });
+init(); loop();
+</script>
+</body>
+</html>
