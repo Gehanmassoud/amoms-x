@@ -162,6 +162,58 @@ This is enterprise intelligence. Not logistics management.
 
 ---
 
+## Two Modes. One Nervous System.
+
+### IMMUNE MODE: No trigger required
+
+Every 15 minutes, with no human prompt and no customer call,
+the Immune Agent scans the Shared Enterprise Context across
+all 28 organizational entities and 41 dependency relationships.
+
+It does not wait for a signal. It looks for the conditions
+that create signals.
+
+When the Immune Agent detects a failure signature:
+
+1. Immune Agent traverses Fabric IQ entity graph unprompted
+2. Detects emerging pattern: carrier degradation, organizational
+   dependency collapse, SLA clustering, inventory depletion
+3. Calculates consequence cascade: second and third order impacts
+4. Publishes risk.emerging to Azure Event Grid
+5. Reasoning Agent activates and executes 5-step chain
+6. Risk Response Agent routes P1-P4 escalation via Work IQ
+7. NERVA Command Center surfaces approval in Microsoft Teams
+8. AgentLog captures full decision with Purview DSPM lineage
+
+The customer never called.
+No ticket was opened.
+No alert had fired.
+No human knew there was a problem.
+
+NERVA noticed.
+
+---
+
+### REACTIVE MODE: What happens when a customer calls
+
+1. Customer calls and Voice Agent answers
+2. Context Agent pulls live order data from Azure SQL
+   and Dynamics 365 via Logic App
+3. Voice Agent answers customer with accurate information
+4. Simultaneously publishes order.customer_inquiry to Azure Event Grid
+5. Reasoning Agent activates, queries Foundry IQ for policy,
+   verifies Fabric IQ semantics, produces 5-step cited
+   Consequence Cascade Reasoning chain
+6. Risk Response Agent alerts the right account manager via Work IQ
+7. Immune Agent scans the Shared Enterprise Context for related
+   organizational patterns
+
+By the time the customer hangs up, the root cause has been
+identified, the SLA has been re-evaluated, and three other
+at-risk orders have been flagged proactively.
+
+---
+
 ## NERVA Future Lab: The Living Enterprise
 
 NERVA Future Lab is the flagship interactive experience for exploring the Enterprise Consequence Graph powered by the Fabric IQ entity graph.
@@ -233,20 +285,6 @@ Remove any one IQ layer and the system breaks architecturally. All three are loa
 | Voice Agent | ag-amosx-voice-prod | Reactive | Inbound call handling | Triggers autonomous mesh cascade via Event Grid |
 
 Plus: NERVA Command Center (Copilot Studio) serving as the human-in-the-loop governance layer inside Microsoft Teams. The five agents coordinate themselves through Azure Event Grid. The Command Center provides human oversight, approval workflows, and executive visibility. It does not orchestrate the agents.
-
----
-
-## What Happens When a Customer Calls
-
-1. Customer calls and Voice Agent answers
-2. Context Agent pulls live order data from Azure SQL and Dynamics 365 via Logic App
-3. Voice Agent answers customer with accurate information
-4. Simultaneously publishes order.customer_inquiry to Azure Event Grid
-5. Reasoning Agent activates, queries Foundry IQ for policy, verifies Fabric IQ semantics, produces 5-step cited Consequence Cascade Reasoning chain
-6. Risk Response Agent alerts the right account manager via Work IQ
-7. Immune Agent scans the Shared Enterprise Context for related organizational patterns
-
-By the time the customer hangs up, the root cause has been identified, the SLA has been re-evaluated, and three other at-risk orders have been flagged proactively.
 
 ---
 
@@ -373,7 +411,7 @@ Azure Platform: Event Grid, Logic Apps, API Management, Azure SQL, Key Vault, En
 
 Development: GitHub Copilot for VS Code, Python, REST APIs
 
-Microsoft 365: Copilot Studio, Power BI, Microsoft Teams
+Microsoft 365: Copilot Studio, Microsoft Teams
 
 ---
 
