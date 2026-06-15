@@ -6,7 +6,7 @@ Contextualize. Anticipate. Intervene. Evolve.
 
 An unprompted immune agent mesh that diagnoses the $1M failure forming from a $10K signal, mitigating second-order consequences and preventing third-order failures across any domain.
 
-**Flagship Experience: NERVA Future Lab**
+**Flagship Experience: [NERVA Resonance](https://nerva-resonance.com/)**
 Explore the futures your decisions create.
 
 Hackathon: Microsoft Agents League @ AI Skills Fest 2026
@@ -14,6 +14,8 @@ Tracks: Reasoning Agents, Enterprise Agents, Creative Apps
 IQ Layers: Foundry IQ, Work IQ, Fabric IQ
 Author: Gehan Massoud
 Repository: github.com/Gehanmassoud/amoms-x
+
+[View Architecture Diagram](https://github.com/Gehanmassoud/amoms-x/blob/main/NERVA%20Architecture%20Diagram.pdf)
 
 ---
 
@@ -101,8 +103,6 @@ NERVA detects all of these. Before the failure. Without being asked.
 
 ## The Solution
 
-NERVA is powered by AMOMS-X, a decentralized enterprise agent mesh where 5 specialized autonomous agents collaborate through Azure Event Grid, reason independently through Azure AI Foundry grounded in all three Microsoft IQ layers, and operate on a governed data foundation with Microsoft Purview DSPM auditing every agent decision.
-
 No central orchestrator. No single point of failure. No ungoverned decisions.
 
 Agents communicate peer-to-peer through Azure Event Grid. There is no master agent, no central controller, no single point of failure. When the Immune Agent detects a threat, it publishes an event and every other agent in the mesh decides independently how to respond.
@@ -182,8 +182,7 @@ When the Immune Agent detects a failure signature:
 4. Publishes risk.emerging to Azure Event Grid
 5. Reasoning Agent activates and executes 5-step chain
 6. Risk Response Agent routes P1-P4 escalation via Work IQ
-7. NERVA Command Center surfaces approval in Microsoft Teams
-8. AgentLog captures full decision with Purview DSPM lineage
+7. NERVA Command Center surfaces approval in Copilot Studio
 
 The customer never called.
 No ticket was opened.
@@ -214,13 +213,13 @@ at-risk orders have been flagged proactively.
 
 ---
 
-## NERVA Future Lab: The Living Enterprise
+## [NERVA Resonance](https://nerva-resonance.com/): The Living Enterprise
 
-NERVA Future Lab is the flagship interactive experience for exploring the Enterprise Consequence Graph powered by the Fabric IQ entity graph.
+NERVA Resonance is the flagship interactive experience for exploring the Enterprise Consequence Graph powered by the Fabric IQ entity graph.
 
 Employees, projects, risks, vendors, customers, and decisions become nodes in a real-time organizational graph. Dependencies become connections. Emerging risks appear as consequence hotspots before failures occur. The Shared Enterprise Context becomes visible and explorable.
 
-The NERVA Future Lab allows executives, operators, and agents to simulate consequence cascades before they occur. Click any entity node and see: what happens if this node fails? What are the second-order impacts? What are the third-order impacts? What does intervention cost versus inaction?
+The NERVA Resonance allows executives, operators, and agents to simulate consequence cascades before they occur. Click any entity node and see: what happens if this node fails? What are the second-order impacts? What are the third-order impacts? What does intervention cost versus inaction?
 
 Built with GitHub Copilot and powered by the Fabric IQ entity graph.
 
@@ -284,7 +283,7 @@ Remove any one IQ layer and the system breaks architecturally. All three are loa
 | Risk Response Agent | ag-amosx-notify-prod | Both | Targeted escalation and mitigation | Work IQ + P1-P4 escalation matrix |
 | Voice Agent | ag-amosx-voice-prod | Reactive | Inbound call handling | Triggers autonomous mesh cascade via Event Grid |
 
-Plus: NERVA Command Center (Copilot Studio) serving as the human-in-the-loop governance layer inside Microsoft Teams. The five agents coordinate themselves through Azure Event Grid. The Command Center provides human oversight, approval workflows, and executive visibility. It does not orchestrate the agents.
+Plus: NERVA Command Center (Copilot Studio) serving as the human-in-the-loop governance layer inside Copilot Studio. The five agents coordinate themselves through Azure Event Grid. The Command Center provides human oversight, approval workflows, and executive visibility. It does not orchestrate the agents.
 
 ---
 
@@ -335,14 +334,11 @@ Every agent decision writes to the AgentLog with the complete reasoning record:
 - Event published to Event Grid
 - Execution time in milliseconds
 
-NERVA does not just decide. It explains, remembers, and learns from every decision. Every decision is traceable from the data source through the reasoning chain to the output, with full Purview DSPM lineage.
-
 ---
 
 ## Architecture
 
     Security + Governance
-    Entra ID, Key Vault, Purview DSPM, Managed Identities
              |
     Microsoft IQ Intelligence Layer
     Foundry IQ, Work IQ, Fabric IQ
@@ -358,7 +354,7 @@ NERVA does not just decide. It explains, remembers, and learns from every decisi
     Each reasons independently over the Shared Enterprise Context
              |
     Human-in-the-Loop Layer
-    NERVA Command Center, Copilot Studio, Microsoft Teams
+    NERVA Command Center, Copilot Studio, Copilot Studio
     Executive visibility, approval workflows, natural language queries
              |
     Integration Layer
@@ -366,12 +362,43 @@ NERVA does not just decide. It explains, remembers, and learns from every decisi
     Stored procedures only, sp_AgentRouter single entry point
              |
     Data Layer
-    Azure SQL, Dynamics 365
-    Full Purview lineage from data to agent decision
+    Azure SQL, Dynamics 365-ready integration layer
              |
     Governance + Learning Layer
-    AgentLog, Procedural Memory
+    AgentLog, RiskResponses, Procedural Memory
     Every decision captured, cited, and available for organizational learning
+
+---
+
+## Security, Governance and Reliability
+
+**Governed. Explainable. Secure. Traceable. Trustworthy.**
+
+NERVA was designed with governance, security, traceability, reliability, and controlled autonomy as foundational architectural principles. The platform combines human-in-the-loop oversight, policy-grounded reasoning, organizational memory, explainable decision intelligence, and controlled data access patterns to ensure that autonomous intelligence remains accountable, transparent, and trustworthy.
+
+| Control Area | Implementation |
+|---|---|
+| Governed Data Access | Controlled Logic App Agent Router integration boundary |
+| Database Connectivity | No direct agent-to-database connectivity |
+| Stored Procedure Access | Stored procedure-only access through sp_AgentRouter |
+| Layer Separation | Separation of reasoning, communication, and persistence layers |
+| Agent Coordination | Event-driven agent coordination with controlled data access patterns |
+| Human-in-the-Loop Governance | Human-in-the-loop governance for autonomous interventions |
+| Policy Grounding | Policy-grounded decision intelligence through Foundry IQ |
+| Shared Enterprise Context | Contextualized and policy-aware reasoning foundation |
+| Explainable Reasoning | Reasoning chains with supporting evidence, policy citations, and consequence analysis |
+| Decision Traceability | End-to-end decision traceability across multi-agent workflows |
+| Audit Trail | AgentLog-backed audit trail for governance, accountability, and forensic review |
+| Procedural Memory Traceability | Organizational learning, pattern reuse, and institutional knowledge retention |
+| Intervention Governance | Controlled mitigation approval, escalation, and intervention workflows |
+| Recommendation Safety | Confidence-scored recommendations with transparent decision rationale |
+| Access Control Design | Architecture aligned with least-privilege access patterns |
+| Secret Management | Azure Key Vault-ready secret management architecture |
+| Consequence Transparency | Transparent consequence intelligence and intervention justification |
+
+### Responsible AI
+
+NERVA incorporates Responsible AI principles through governed decision intelligence, explainable reasoning, human oversight, and transparent intervention workflows. Key controls include human-in-the-loop governance, policy-grounded reasoning, explainable decision chains, decision traceability, confidence-scored recommendations, AgentLog auditability, controlled mitigation approval workflows, and organizational memory transparency.
 
 ---
 
@@ -382,7 +409,6 @@ NERVA does not just decide. It explains, remembers, and learns from every decisi
 | Identity | Azure Managed Identities, no secrets in code |
 | Database | Stored procedures only, no direct table writes |
 | Secrets | Azure Key Vault, never hardcoded |
-| Governance | Microsoft Purview DSPM on every agent decision |
 | Sensitivity | PII labels automatically enforced |
 | Lineage | Full trace from data source to output |
 | Network | API Management with throttling and rate limiting |
@@ -390,28 +416,145 @@ NERVA does not just decide. It explains, remembers, and learns from every decisi
 
 ---
 
+## Accessibility
+
+NERVA incorporates accessibility and industry independence as first-class capabilities, ensuring that enterprise intelligence, consequence analysis, governance workflows, and organizational learning remain accessible to a broad range of users, stakeholders, and industries.
+
+### Industry Independence by Design
+
+NERVA was designed as a domain-agnostic enterprise nervous system rather than a solution for a single industry. The platform contextualizes signals, anticipates consequences, recommends interventions, and evolves organizational learning across any operational environment without requiring changes to the core architecture.
+
+The same architecture can be applied to:
+
+- Supply Chain
+- Healthcare
+- Humanitarian Response
+- Financial Services
+- Cybersecurity
+- Technology Operations
+- Workforce and HR
+- Critical Infrastructure
+- Public Sector
+- Any future enterprise domain
+
+Rather than modeling a specific business process, NERVA models how organizations detect signals, understand context, anticipate consequences, coordinate interventions, and learn from outcomes. This allows the NERVA Agent Mesh, Procedural Memory, Command Center, Voice Agent, and NERVA Resonance to operate consistently across industries while adapting to domain-specific knowledge through Foundry IQ, Work IQ, Fabric IQ, and enterprise context sources.
+
+### Explainable AI
+
+All decisions are presented as structured reasoning chains including operational signals, policy citations, business impact, confidence levels, recommended interventions, and organizational learning references, ensuring transparency and accessibility for both technical and non-technical stakeholders.
+
+### Voice-First Interaction
+
+The NERVA Voice Agent enables hands-free access to enterprise intelligence through natural language conversations. Users can request consequence analysis, query organizational context, review reasoning chains, inspect policy citations, and approve or reject mitigations without requiring traditional dashboard interactions.
+
+### Natural Language Governance
+
+NERVA Command Center supports voice-driven governance workflows, allowing users to perform operational actions including approving or rejecting mitigations, requesting additional analysis, and escalating for executive review through natural language commands. This enables human-in-the-loop governance without requiring users to navigate complex operational systems.
+
+### Consequence Narration
+
+NERVA can narrate consequence trajectories using natural language.
+
+Example interaction:
+
+    "NERVA, explain the impact of this decision."
+
+    Response: "A 45-minute delay has increased the probability
+    of SLA breach to 70%. If no action is taken, revenue
+    exposure may reach $150,000. Recommended intervention:
+    Tier 2 escalation per SLA-PREM-002 Section 3.1."
+
+This enables consequence intelligence to be consumed through voice interactions rather than requiring visual analysis.
+
+### Screen Reader Friendly Design
+
+NERVA Resonance is designed using semantic interface principles supporting structured consequence explanations, keyboard navigation, screen-reader-friendly reasoning outputs, and accessible presentation of policy citations and governance decisions.
+
+---
+
 ## Rubric Compliance
 
 | Criterion | Weight | How NERVA Scores |
 |---|---|---|
-| Accuracy and Relevance | 20% | Live SQL data + Foundry IQ citations + Purview lineage |
 | Reasoning and Multi-step | 20% | 5-step Consequence Cascade Reasoning chain, logged, cited, dual IQ verification, Shared Enterprise Context graph traversal |
-| Creativity and Originality | 15% | NERVA Future Lab + Consequence Cascade Reasoning + immune detection + organizational risk detection |
-| UX and Presentation | 15% | Voice interface + NERVA Command Center + Future Lab dashboard |
-| Reliability and Safety | 20% | Purview DSPM + Managed Identities + stored procedures only + Procedural Memory |
+| Creativity and Originality | 15% | NERVA Resonance + Consequence Cascade Reasoning + immune detection + organizational risk detection |
+| UX and Presentation | 15% | Voice interface + NERVA Command Center + Resonance dashboard + accessible design |
 | Community Vote | 10% | The system that noticed before anyone asked |
+
+---
+
+## Keywords
+
+Azure AI Foundry, Foundry IQ, Work IQ, Fabric IQ,
+Multi-Agent System, Autonomous Agents, A2A Architecture,
+Azure Event Grid, Consequence Cascade Reasoning,
+Immune Detection, Proactive Risk Detection,
+5-Step Reasoning Chain, Grounded Reasoning, Policy Citation,
+Semantic Verification, Procedural Memory, AgentLog,
+Logic Apps, Azure SQL, Stored Procedures,
+Voice Live, Voice Agent, Copilot Studio, Copilot Studio,
+Human-in-the-Loop, GitHub Copilot, AI-Assisted Development,
+NERVA Resonance, Enterprise Consequence Graph,
+Accessibility, WCAG, Keyboard Navigation,
+Shared Enterprise Context, Industry Independent,
+Supply Chain, Healthcare, Humanitarian, Hack for Good,
+Responsible AI, Explainable AI, SLA Breach Prevention,
+Carrier Anomaly Detection, Organizational Risk Detection
 
 ---
 
 ## Technologies Used
 
-AI and Agents: Azure AI Foundry, GPT-4.1-mini, Foundry IQ, Work IQ, Fabric IQ
+### AI and Agents
+| Technology | Purpose |
+|---|---|
+| Azure AI Foundry | Agent hosting and orchestration |
+| GPT-4.1-mini | Reasoning model for all 5 autonomous agents |
+| Foundry IQ | Policy grounding, kb-amosx-prod, 10 documents, Answer synthesis |
+| Work IQ | Organizational graph, escalation routing, Work IQ User and Mail tools |
+| Fabric IQ | Semantic entity ontology, 12 entity types, Shared Enterprise Context |
 
-Azure Platform: Event Grid, Logic Apps, API Management, Azure SQL, Key Vault, Entra ID, Managed Identities, Purview DSPM
+### Azure Platform
+| Technology | Purpose |
+|---|---|
+| Azure Event Grid | A2A peer-to-peer agent mesh spine |
+| Azure Logic Apps | Agent Router, sp_AgentRouter, single SQL entry point |
+| Azure SQL Database | 7 tables, 9 stored procedures, AgentLog observability |
+| Azure AI Search | Foundry IQ index |
+| Azure Key Vault | Centralized secret management, all credentials at runtime |
+| Microsoft Entra ID | Agent identity, Managed Identities, no secrets in code |
+| API Management | Rate limiting and throttling |
 
-Development: GitHub Copilot for VS Code, Python, REST APIs
+### Development
+| Technology | Purpose |
+|---|---|
+| GitHub Copilot | Built voice_agent.py (148L), sla_monitor.py (178L), immune_agent.py, context_agent.py, risk_response_agent.py, session recorded |
+| VS Code | Primary development environment |
+| Python 3 | Agent implementation language |
+| Git | Version control |
+| REST APIs | OpenAPI tool connections for all agents |
 
-Microsoft 365: Copilot Studio, Microsoft Teams
+### Microsoft 365 and Copilot
+| Technology | Purpose |
+|---|---|
+| Copilot Studio | NERVA Command Center, human-in-the-loop governance |
+| Copilot Studio | Agent deployment and executive visibility channel |
+| Voice Live | Azure Speech, Ava Dragon HD, Voice Agent inbound calls |
+
+### Creative and Visualization
+| Technology | Purpose |
+|---|---|
+| NERVA Resonance | Enterprise Consequence Graph, HTML Canvas API, physics simulation, consequence cascade, keyboard navigation, high contrast, ARIA live regions, WCAG AA accessible, built with GitHub Copilot |
+| NERVA Dashboard | Unified front-end demo application, live agent feed, Event Grid visualization |
+
+### Data and Governance
+| Technology | Purpose |
+|---|---|
+| sp_AgentRouter | Single SQL entry point for all agent operations |
+| sp_GetOrderStatus | Live order data retrieval |
+| sp_GetCarrierAnomalies | Carrier anomaly detection data |
+| sp_ProceduralMemory | Organizational learning capture |
+| sp_RiskResponse | Risk response logging |
 
 ---
 
@@ -419,35 +562,51 @@ Microsoft 365: Copilot Studio, Microsoft Teams
 
 The SQL Server is named sql-amosx-prod-eus but is physically deployed in West US due to East US regional capacity constraints at time of creation. All agents connect correctly through the Logic App router.
 
+Azure Key Vault (kv-amosx-prod-eus) is deployed in East US and serves as the centralized secret management layer for all NERVA agents. All agent credentials, API keys, and connection strings are retrieved from Key Vault at runtime through Azure Managed Identities. No secrets are stored in code or committed to source control.
+
+Dynamics 365 is included as an enterprise system-of-record integration point for customer, account, and service context. In the current build, Azure SQL acts as the live operational data source while the architecture is prepared for Dynamics 365 customer and account enrichment through the Shared Enterprise Context layer.
+
 ---
 
 ## Repository Structure
 
+    amoms-x/
     agents/
-      context_agent.py       Context Agent - Shared Enterprise Context retrieval
-                             Azure SQL + Dynamics 365, built with GitHub Copilot
-      voice_agent.py         Voice Agent - inbound calls, cascade trigger
-                             Built with GitHub Copilot
-      sla_monitor.py         Reasoning Agent - 5-step Consequence Cascade Reasoning
-                             Built with GitHub Copilot
-      immune_agent.py        Immune Agent - proactive detection every 15 minutes
-                             Built with GitHub Copilot
-      risk_response_agent.py Risk Response Agent - escalation, approval, mitigation
-                             Built with GitHub Copilot
-    sql/
-      schema/                Table definitions including AgentLog observability table
-      stored_procedures/     All SQL access via stored procedures only
-                             sp_AgentRouter routes all agent requests
+      context_agent.py         Context Agent - Shared Enterprise Context retrieval
+                               Azure SQL + Dynamics 365-ready, built with GitHub Copilot
+      immune_agent.py          Immune Agent - proactive detection every 15 minutes
+                               Built with GitHub Copilot
+      risk_response_agent.py   Risk Response Agent - escalation, approval, mitigation
+                               Built with GitHub Copilot
+      sla_monitor.py           Reasoning Agent - 5-step Consequence Cascade Reasoning
+                               Built with GitHub Copilot
+      voice_agent.py           Voice Agent - inbound calls, cascade trigger
+                               Built with GitHub Copilot
     foundry_iq/
-      knowledge_base/        10 policy documents covering SLA tiers, carrier escalation,
-                             inventory protocols, immune detection patterns,
-                             humanitarian logistics, breach escalation matrix
-    nerva-neural-map.html    NERVA Future Lab - Enterprise Consequence Graph visualization
-    nerva-dashboard.html     NERVA unified dashboard - full agent mesh front end
-    nerva-architecture-diagram-FINAL_DEMO_READY.html  Architecture diagram
-    .env.example             Environment template, no real secrets committed
-
----
+      knowledge_base/
+        README.md
+        atp-calculation-policy.md        INV-ATP-001
+        breach-escalation-matrix.md      SLA-ESC-001
+        carrier-escalation-procedure.md  OPS-CARRIER-001
+        humanitarian-logistics-protocol.md  OPS-HUM-001
+        immune-detection-patterns.md     OPS-IMMUNE-001
+        inventory-shortage-protocol.md   OPS-INV-001
+        notification-templates.md        OPS-NOTIF-001
+        sla-policy-enterprise.md         SLA-ENT-001
+        sla-policy-premium.md            SLA-PRE-001
+        sla-policy-standard.md           SLA-STD-001
+    sql/
+      schema/
+        README.md
+        tables.sql             7 tables including AgentLog observability table
+      stored_procedures/
+        README.md
+        sp_AgentRouter.sql     Single entry point for all agent SQL operations
+        sp_GetCarrierAnomalies.sql
+        sp_GetOrderStatus.sql
+    .env.example               Environment template, no real secrets committed
+    LICENSE                    MIT License
+    NERVA Architecture Diagram.pdf  Full 7-layer architecture diagram
 
 ## Setup
 
@@ -466,21 +625,33 @@ Key resources:
 
 ## Demo Video
 
-Link to be added before submission deadline June 14 2026
+https://www.youtube.com/@NERVA-v3t
 
 ---
 
 ## Hack for Good
 
-NERVA applies directly to humanitarian logistics, food banks, disaster relief, and refugee supply chains.
+NERVA was designed to be industry-independent by design.
 
-The same Immune Agent that detects a carrier failure affecting $383,000 in commercial orders detects a distribution disruption affecting 340 families before they miss their weekly food delivery.
+The same architecture that protects revenue, service levels, and operational continuity inside enterprises can also support organizations operating in environments where the consequences are measured not only in dollars, but in human outcomes.
 
-The same Consequence Cascade Reasoning that evaluates three intervention trajectories for a Premium SLA order evaluates three route alternatives for a humanitarian distribution network, prioritizing families with children and medical dietary needs first.
+NERVA's ability to contextualize signals, anticipate consequences, coordinate interventions, and evolve organizational learning can be applied across:
 
-The same Purview governance that protects commercial customer PII protects the identities and locations of vulnerable beneficiaries.
+- Humanitarian Response
+- Disaster Relief
+- Food Distribution Networks
+- Healthcare Operations
+- Critical Infrastructure
+- Public Sector Services
+- Community Support Organizations
 
-Same system. Same agents. Same reasoning engine. Infinitely higher stakes.
+A delayed shipment, a resource shortage, a service interruption, or a coordination failure may appear as isolated events. NERVA evaluates how those signals propagate through interconnected systems, identifies emerging risks, and recommends interventions before the consequences escalate.
+
+The mission remains the same regardless of domain:
+
+Detect earlier. Understand deeper. Intervene sooner. Learn continuously.
+
+Whether protecting enterprise operations or supporting communities during times of need, NERVA provides organizations with the ability to see beyond immediate events and understand the consequences that follow.
 
 ---
 
