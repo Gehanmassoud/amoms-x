@@ -7,6 +7,8 @@ from typing import Any, Dict, List
 
 import requests
 
+from nerva_modes import NervaMode
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -109,10 +111,20 @@ class ImmuneAgent:
     def _publish_risk_event(self, anomaly: Dict[str, Any], procedures: List[Dict[str, Any]]) -> None:
         event = {
             "id": f"risk-emerging-{anomaly['carrierId']}-{int(datetime.utcnow().timestamp())}",
-            "eventType": "risk.emerging",
-            "subject": f"carrier/{anomaly['carrierId']}/emerging-risk",
+            "eventType": "nerva.immune.threat_detected",
+            "subject": f"nerva/immune/carrier/{anomaly['carrierId']}",
             "eventTime": datetime.utcnow().isoformat() + "Z",
             "data": {
+                "nervaMode": NervaMode.IMMUNE,
+                "signalSource": "Immune Agent",
+                "signalType": "carrier_anomaly",
+
+                "contextRequired": True,
+                "reasoningRequired": True,
+                "cascadeAnalysisRequired": True,
+                "futureTrajectoryRequired": True,
+                "riskAssessmentRequired": True,
+
                 "carrierId": anomaly["carrierId"],
                 "confidence": anomaly["confidence"],
                 "reasons": anomaly["reasons"],
@@ -127,17 +139,21 @@ class ImmuneAgent:
         }
         response = requests.post(self.event_grid_endpoint, headers=headers, json=[event])
         response.raise_for_status()
-        logger.info("Published risk.emerging event for carrier %s with confidence %s", anomaly["carrierId"], anomaly["confidence"])
+        logger.info("Published nerva.immune.threat_detected event for carrier %s with confidence %s", anomaly["carrierId"], anomaly["confidence"])
 
     def run_scan(self) -> None:
         records = self._fetch_carrier_performance()
         anomalies = self._detect_anomalies(records)
         for anomaly in anomalies:
+            procedures = []
+
             if anomaly["confidence"] >= 0.7:
-                procedures = self._query_escalation_procedures(anomaly["carrierId"], anomaly["reasons"])
-                self._publish_risk_event(anomaly, procedures)
-            else:
-                logger.info("Anomaly confidence below threshold for carrier %s: %s", anomaly["carrierId"], anomaly["confidence"])
+                procedures = self._query_escalation_procedures(
+                    anomaly["carrierId"],
+                    anomaly["reasons"]
+                )
+
+            self._publish_risk_event(anomaly, procedures)
 
     def start(self) -> None:
         interval_seconds = self.poll_interval_minutes * 60
