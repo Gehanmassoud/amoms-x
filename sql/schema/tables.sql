@@ -68,15 +68,40 @@ CREATE TABLE dbo.CarrierPerformance (
 );
 
 CREATE TABLE dbo.ImmuneAlerts (
-    AlertID         INT             IDENTITY(1,1) PRIMARY KEY,
-    ThreatType      VARCHAR(50)     NOT NULL,
-    Severity        VARCHAR(20)     NOT NULL,
-    CarrierID       VARCHAR(20)     NULL,
-    PatternConfidence DECIMAL(5,2)  NOT NULL,
-    AffectedOrders  INT             DEFAULT 0,
-    AffectedRevenue DECIMAL(14,2)   DEFAULT 0,
-    AutonomousActions NVARCHAR(MAX) NULL,
-    PendingApprovals NVARCHAR(MAX)  NULL,
-    Status          VARCHAR(20)     DEFAULT 'Active',
-    CreatedAt       DATETIME        DEFAULT GETDATE()
+    AlertID           INT             IDENTITY(1,1) PRIMARY KEY,
+    ThreatType        VARCHAR(50)     NOT NULL,
+    Severity          VARCHAR(20)     NOT NULL,
+    CarrierID         VARCHAR(20)     NULL,
+    PatternConfidence DECIMAL(5,2)    NOT NULL,
+    AffectedOrders    INT             DEFAULT 0,
+    AffectedRevenue   DECIMAL(14,2)   DEFAULT 0,
+    AutonomousActions NVARCHAR(MAX)   NULL,
+    PendingApprovals  NVARCHAR(MAX)   NULL,
+    Status            VARCHAR(20)     DEFAULT 'Active',
+    CreatedAt         DATETIME        DEFAULT GETDATE()
+);
+
+CREATE TABLE dbo.ProceduralMemory (
+    MemoryID            INT             IDENTITY(1,1) PRIMARY KEY,
+    PatternID           VARCHAR(50)     NOT NULL,
+    ScenarioType        VARCHAR(100)    NOT NULL,
+    TriggerConditions   NVARCHAR(MAX)   NOT NULL,
+    RecommendedAction   NVARCHAR(MAX)   NOT NULL,
+    OutcomeDescription  NVARCHAR(MAX)   NULL,
+    ConfidenceScore     DECIMAL(5,2)    NULL,
+    TimesReused         INT             DEFAULT 0,
+    LastUsed            DATETIME        NULL,
+    CreatedAt           DATETIME        DEFAULT GETDATE()
+);
+
+CREATE TABLE dbo.RiskResponses (
+    ResponseID          INT             IDENTITY(1,1) PRIMARY KEY,
+    RiskID              VARCHAR(50)     NOT NULL,
+    OrderID             VARCHAR(20)     NOT NULL,
+    EscalationLevel     VARCHAR(20)     NOT NULL,
+    MitigationAction    NVARCHAR(MAX)   NOT NULL,
+    ApprovalRequired    BIT             DEFAULT 0,
+    Stakeholders        NVARCHAR(MAX)   NULL,
+    Status              VARCHAR(20)     DEFAULT 'Open',
+    CreatedAt           DATETIME        DEFAULT GETDATE()
 );
