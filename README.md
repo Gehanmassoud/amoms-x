@@ -551,7 +551,7 @@ Carrier Anomaly Detection, Organizational Risk Detection
 
 |Technology|Purpose|
 |-|-|
-|GitHub Copilot|Built voice\_agent.py (148L), sla\_monitor.py (178L), immune\_agent.py, context\_agent.py, risk\_response\_agent.py, consequence\_cascade.py, future\_trajectory\_engine.py, session recorded|
+|GitHub Copilot|Built voice\_agent.py, sla\_monitor.py, immune\_agent.py, context\_agent.py, risk\_response\_agent.py, consequence\_cascade\_engine.py, future\_trajectory\_engine.py, session recorded|
 |VS Code|Primary development environment|
 |Python 3|Agent implementation language|
 |Git|Version control|
@@ -609,7 +609,7 @@ amoms-x/
 ├── agents/
 │   ├── context_agent.py
 │   ├── sla_monitor.py
-│   ├── consequence_cascade.py
+│   ├── consequence_cascade_engine.py
 │   ├── future_trajectory_engine.py
 │   ├── immune_agent.py
 │   ├── risk_response_agent.py
