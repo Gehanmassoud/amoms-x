@@ -6,6 +6,8 @@ from typing import Any, Dict
 import requests
 from flask import Flask, request, jsonify
 
+from nerva_modes import NervaMode
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -134,12 +136,20 @@ class VoiceAgent:
 
         event = {
             "id": f"voice-signal-{call_id}-{int(datetime.utcnow().timestamp())}",
-            "eventType": "signal.received",
-            "subject": f"voice/order/{order_id or 'unknown'}/signal",
+            "eventType": "nerva.reactive.inquiry",
+            "subject": f"nerva/reactive/order/{order_id or 'unknown'}",
             "eventTime": datetime.utcnow().isoformat() + "Z",
             "data": {
+                "nervaMode": NervaMode.REACTIVE,
                 "signalSource": "Voice Agent",
-                "signalType": "customer_inquiry",
+                "signalType": "voice_customer_inquiry",
+
+                "contextRequired": True,
+                "reasoningRequired": True,
+                "cascadeAnalysisRequired": True,
+                "futureTrajectoryRequired": True,
+                "riskAssessmentRequired": True,
+
                 "callId": call_id,
                 "customerPhone": customer_phone,
                 "orderId": order_id,
@@ -153,17 +163,29 @@ class VoiceAgent:
 
         return {
             "status": "processed",
-            "eventType": "signal.received",
+            "eventType": "nerva.reactive.inquiry",
             "callId": call_id,
             "orderId": order_id,
         }
 
 
-agent = VoiceAgent()
+try:
+    agent = VoiceAgent()
+except Exception as ex:
+    logger.warning("VoiceAgent initialization failed: %s", ex)
+    agent = None
 
 
 @app.route("/inbound-call", methods=["POST"])
 def inbound_call_endpoint():
+    if agent is None:
+        return jsonify(
+            {
+                "status": "error",
+                "message": "Voice Agent not configured"
+            }
+        ), 500
+
     payload = request.get_json(force=True)
     result = agent.handle_inbound_call(payload)
     return jsonify(result)
