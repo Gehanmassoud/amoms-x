@@ -296,19 +296,26 @@ Plus: NERVA Command Center (Copilot Studio) serving as the human-in-the-loop gov
 
 \---
 
+### NERVA Reasoning Engines
+
+|Engine|Purpose|
+|-|-|
+|Consequence Cascade Engine|Evaluates immediate, downstream, and long-term impacts of decisions|
+|Future Trajectory Engine|Generates best-case, expected-case, and worst-case future scenarios|
+
 ## Reasoning Agent: 5-Step Consequence Cascade Reasoning Chain
 
 Every step is logged, cited, and auditable.
 
-Step 1 DETECT: Query Azure SQL for at-risk orders via Context Agent
-Step 2 RETRIEVE POLICY: Query Foundry IQ, return cited policy document with exact policy ID and section
-Step 3 VERIFY SEMANTICS: Confirm entity classification via Fabric IQ ontology
-Step 4 DECIDE: Evaluate consequence trajectories, produce decision with confidence score and full citation chain
-Step 5 LEARN: Write complete reasoning artifact to AgentLog and Procedural Memory via stored procedure
+    Step 1 DETECT: Query Azure SQL for at-risk orders via Context Agent
+    Step 2 RETRIEVE POLICY: Query Foundry IQ, return cited policy document with exact policy ID and section
+    Step 3 VERIFY SEMANTICS: Confirm entity classification via Fabric IQ ontology
+    Step 4 DECIDE: Evaluate consequence trajectories, produce decision with confidence score and full citation chain
+    Step 5 LEARN: Write complete reasoning artifact to AgentLog and Procedural Memory via stored procedure
 
 Real output for Premium order ORD-1009:
 
-&#x20;   STEP 2 POLICY RETRIEVAL:
+    STEP 2 POLICY RETRIEVAL:
     Policy Found: AMOMS-X SLA Policy, Premium Tier
     Citation: SLA-PREM-002, Section 3.1
     Required Action: Escalate to Tier 2 support and notify customer within 2 hours
@@ -322,7 +329,7 @@ Real output for Premium order ORD-1009:
     Confidence: 85%
     Revenue at risk: $150,000
     Event to Publish: sla.atrisk
-    Citations: \[SLA-PREM-002 Section 3.1] \[fabric-iq/entity\_Customer]
+    Citations: [SLA-PREM-002 Section 3.1] [fabric-iq/entity_Customer]
 
     STEP 5 LEARN:
     Pattern: Premium + 3hrs + 45min delay = P2 escalation (85%)
@@ -365,7 +372,7 @@ Every agent decision writes to the AgentLog with the complete reasoning record:
     Each reasons independently over the Shared Enterprise Context
              |
     Human-in-the-Loop Layer
-    NERVA Command Center, Copilot Studio, Copilot Studio
+    NERVA Command Center, Copilot Studio
     Executive visibility, approval workflows, natural language queries
              |
     Integration Layer
@@ -505,7 +512,7 @@ Immune Detection, Proactive Risk Detection,
 5-Step Reasoning Chain, Grounded Reasoning, Policy Citation,
 Semantic Verification, Procedural Memory, AgentLog,
 Logic Apps, Azure SQL, Stored Procedures,
-Voice Live, Voice Agent, Copilot Studio, Copilot Studio,
+Voice Live, Voice Agent, Copilot Studio,
 Human-in-the-Loop, GitHub Copilot, AI-Assisted Development,
 NERVA Resonance, Enterprise Consequence Graph,
 Accessibility, WCAG, Keyboard Navigation,
@@ -534,7 +541,7 @@ Carrier Anomaly Detection, Organizational Risk Detection
 |-|-|
 |Azure Event Grid|A2A peer-to-peer agent mesh spine|
 |Azure Logic Apps|Agent Router, sp\_AgentRouter, single SQL entry point|
-|Azure SQL Database|7 tables, 9 stored procedures, AgentLog observability|
+|Azure SQL Database|9 tables, 12 stored procedures, AgentLog observability|
 |Azure AI Search|Foundry IQ index|
 |Azure Key Vault|Centralized secret management, all credentials at runtime|
 |Microsoft Entra ID|Agent identity, Managed Identities, no secrets in code|
@@ -544,7 +551,7 @@ Carrier Anomaly Detection, Organizational Risk Detection
 
 |Technology|Purpose|
 |-|-|
-|GitHub Copilot|Built voice\_agent.py (148L), sla\_monitor.py (178L), immune\_agent.py, context\_agent.py, risk\_response\_agent.py, session recorded|
+|GitHub Copilot|Built voice\_agent.py (148L), sla\_monitor.py (178L), immune\_agent.py, context\_agent.py, risk\_response\_agent.py, consequence\_cascade.py, future\_trajectory\_engine.py, session recorded|
 |VS Code|Primary development environment|
 |Python 3|Agent implementation language|
 |Git|Version control|
@@ -554,8 +561,8 @@ Carrier Anomaly Detection, Organizational Risk Detection
 
 |Technology|Purpose|
 |-|-|
-|Copilot Studio|NERVA Command Center, human-in-the-loop governance|
-|Copilot Studio|Agent deployment and executive visibility channel|
+|Copilot Studio|NERVA Command Center, human-in-the-loop governance, executive visibility|
+|Microsoft 365 Copilot|Executive interaction and organizational context access|
 |Voice Live|Azure Speech, Ava Dragon HD, Voice Agent inbound calls|
 
 ### Creative and Visualization
@@ -569,11 +576,18 @@ Carrier Anomaly Detection, Organizational Risk Detection
 
 |Technology|Purpose|
 |-|-|
-|sp\_AgentRouter|Single SQL entry point for all agent operations|
-|sp\_GetOrderStatus|Live order data retrieval|
-|sp\_GetCarrierAnomalies|Carrier anomaly detection data|
-|sp\_ProceduralMemory|Organizational learning capture|
-|sp\_RiskResponse|Risk response logging|
+|sp_AgentRouter|Single SQL entry point for all agent operations|
+|sp_GetOrderStatus|Live order data retrieval|
+|sp_GetSLARiskOrders|Returns SLA at-risk and critical orders|
+|sp_GetCarrierAnomalies|Carrier anomaly detection data|
+|sp_GetActiveOrdersByCarrier|Returns active orders grouped by carrier|
+|sp_GetImmuneScanData|Returns operational data for Immune Agent scans|
+|sp_LogAgentDecision|Writes agent decisions to AgentLog observability table|
+|sp_CreateImmuneAlert|Creates proactive immune alert records|
+|sp_UpdateDeliveryStatus|Updates delivery status following mitigation actions|
+|sp_UpdateSLAStatus|Updates SLA status following recovery or escalation|
+|sp_ProceduralMemory|Returns organizational learning history|
+|sp_RiskResponse|Returns risk mitigation and response knowledge|
 
 \---
 
@@ -589,43 +603,57 @@ Dynamics 365 is included as an enterprise system-of-record integration point for
 
 ## Repository Structure
 
-&#x20;   amoms-x/
-    agents/
-      context\_agent.py         Context Agent - Shared Enterprise Context retrieval
-                               Azure SQL + Dynamics 365-ready, built with GitHub Copilot
-      immune\_agent.py          Immune Agent - proactive detection every 15 minutes
-                               Built with GitHub Copilot
-      risk\_response\_agent.py   Risk Response Agent - escalation, approval, mitigation
-                               Built with GitHub Copilot
-      sla\_monitor.py           Reasoning Agent - 5-step Consequence Cascade Reasoning
-                               Built with GitHub Copilot
-      voice\_agent.py           Voice Agent - inbound calls, cascade trigger
-                               Built with GitHub Copilot
-    foundry\_iq/
-      knowledge\_base/
-        README.md
-        atp-calculation-policy.md        INV-ATP-001
-        breach-escalation-matrix.md      SLA-ESC-001
-        carrier-escalation-procedure.md  OPS-CARRIER-001
-        humanitarian-logistics-protocol.md  OPS-HUM-001
-        immune-detection-patterns.md     OPS-IMMUNE-001
-        inventory-shortage-protocol.md   OPS-INV-001
-        notification-templates.md        OPS-NOTIF-001
-        sla-policy-enterprise.md         SLA-ENT-001
-        sla-policy-premium.md            SLA-PRE-001
-        sla-policy-standard.md           SLA-STD-001
-    sql/
-      schema/
-        README.md
-        tables.sql             7 tables including AgentLog observability table
-      stored\_procedures/
-        README.md
-        sp\_AgentRouter.sql     Single entry point for all agent SQL operations
-        sp\_GetCarrierAnomalies.sql
-        sp\_GetOrderStatus.sql
-    .env.example               Environment template, no real secrets committed
-    LICENSE                    MIT License
-    NERVA Architecture Diagram.pdf  Full 7-layer architecture diagram
+```
+amoms-x/
+│
+├── agents/
+│   ├── context_agent.py
+│   ├── sla_monitor.py
+│   ├── consequence_cascade.py
+│   ├── future_trajectory_engine.py
+│   ├── immune_agent.py
+│   ├── risk_response_agent.py
+│   └── voice_agent.py
+│
+├── foundry_iq/
+│   └── knowledge_base/
+│       ├── README.md
+│       ├── atp-calculation-policy.md
+│       ├── breach-escalation-matrix.md
+│       ├── carrier-escalation-procedure.md
+│       ├── humanitarian-logistics-protocol.md
+│       ├── immune-detection-patterns.md
+│       ├── inventory-shortage-protocol.md
+│       ├── notification-templates.md
+│       ├── sla-policy-enterprise.md
+│       ├── sla-policy-premium.md
+│       └── sla-policy-standard.md
+│
+├── sql/
+│   ├── schema/
+│   │   ├── README.md
+│   │   └── tables.sql            Core NERVA database schema (9 tables)
+│   │
+│   └── stored_procedures/
+│       ├── README.md
+│       ├── sp_AgentRouter.sql
+│       ├── sp_GetOrderStatus.sql
+│       ├── sp_GetSLARiskOrders.sql
+│       ├── sp_GetCarrierAnomalies.sql
+│       ├── sp_GetActiveOrdersByCarrier.sql
+│       ├── sp_GetImmuneScanData.sql
+│       ├── sp_LogAgentDecision.sql
+│       ├── sp_CreateImmuneAlert.sql
+│       ├── sp_UpdateDeliveryStatus.sql
+│       ├── sp_UpdateSLAStatus.sql
+│       ├── sp_ProceduralMemory.sql
+│       └── sp_RiskResponse.sql
+│
+├── .env.example
+├── LICENSE
+├── NERVA Architecture Diagram.pdf
+└── README.md
+```
 
 
 ## Setup
